@@ -33,6 +33,79 @@ export default function ChartProvider({ children }: Props) {
   const [selectedId, setSelectedId] = useState(ALL);
   const [ids, setIds] = useState<string[]>([]);
 
+  const getDataSets = useCallback((response: Response[], selectedId: string) => {
+    setData({
+      labels: response.map((response) => response.date),
+      datasets: [
+        {
+          type: 'line',
+          label: 'value_area',
+          data: response.map((response) => response.value_area),
+          yAxisID: 'line',
+          fill: true,
+          backgroundColor: AREA_CHART_COLOR,
+        },
+        {
+          type: 'bar',
+          label: 'value_bar',
+          borderWidth: 2,
+          data: response.map((response) => response.value_bar),
+          yAxisID: 'bar',
+          backgroundColor: (context: ChartContextAPI) => {
+            const { dataIndex } = context;
+            return response[dataIndex].id === selectedId ? BAR_CHART_HIGHLIGHT_COLOR : BAR_CHART_COLOR;
+          },
+        },
+      ],
+    });
+  }, []);
+
+  const getOptions = useCallback(
+    (response: Response[]): ChartOptions => {
+      const handleChartClick: ChartClick = (_, elements, response: Response[]) => {
+        const element = elements[0];
+        if (!element) {
+          return;
+        }
+        getDataSets(response, response[element.index].id);
+        setSelectedId(response[element.index].id);
+      };
+
+      return {
+        scales: {
+          x: {
+            grid: {
+              drawOnChartArea: false,
+            },
+          },
+          bar: {
+            display: true,
+            position: 'left',
+          },
+          line: {
+            display: true,
+            position: 'right',
+          },
+        },
+        interaction: {
+          mode: 'index',
+        },
+        onClick: (_, elements) => handleChartClick(_, elements, response),
+        plugins: {
+          tooltip: {
+            callbacks: {
+              title(tooltipItems: any) {
+                const tooltipItem = tooltipItems[0];
+                return `${tooltipItem.label}, id: ${response[tooltipItem.dataIndex].id}`;
+              },
+            },
+          },
+        },
+      };
+    },
+    [getDataSets],
+  );
+
   useEffect(() => {
     const getResponse = async () => {
       const { response } = await httpClientInstanse.fetch('/chart/mock_data').then((response) => response.json());
@@ -50,80 +123,7 @@ export default function ChartProvider({ children }: Props) {
     };
 
     getResponse();
-  }, []);
-
-  const getDataSets = useCallback(
-    (response: Response[], selectedId: string) => {
-      setData({
-        labels: response.map((response) => response.date),
-        datasets: [
-          {
-            type: 'line',
-            label: 'value_area',
-            data: response.map((response) => response.value_area),
-            yAxisID: 'line',
-            fill: true,
-            backgroundColor: AREA_CHART_COLOR,
-          },
-          {
-            type: 'bar',
-            label: 'value_bar',
-            borderWidth: 2,
-            data: response.map((response) => response.value_bar),
-            yAxisID: 'bar',
-            backgroundColor: (context: ChartContextAPI) => {
-              const { dataIndex } = context;
-              return response[dataIndex].id === selectedId ? BAR_CHART_HIGHLIGHT_COLOR : BAR_CHART_COLOR;
-            },
-          },
-        ],
-      });
-    },
-    [response],
-  );
-
-  const getOptions = useCallback((response: Response[]): ChartOptions => {
-    const handleChartClick: ChartClick = (_, elements, response: Response[]) => {
-      const element = elements[0];
-      if (!element) {
-        return;
-      }
-      getDataSets(response, response[element.index].id);
-      setSelectedId(response[element.index].id);
-    };
-
-    return {
-      scales: {
-        x: {
-          grid: {
-            drawOnChartArea: false,
-          },
-        },
-        bar: {
-          display: true,
-          position: 'left',
-        },
-        line: {
-          display: true,
-          position: 'right',
-        },
-      },
-      interaction: {
-        mode: 'index',
-      },
-      onClick: (_, elements) => handleChartClick(_, elements, response),
-      plugins: {
-        tooltip: {
-          callbacks: {
-            title(tooltipItems: any) {
-              const tooltipItem = tooltipItems[0];
-              return `${tooltipItem.label}, id: ${response[tooltipItem.dataIndex].id}`;
-            },
-          },
-        },
-      },
-    };
-  }, []);
+  }, [getDataSets, getOptions]);
 
   return (
     <ChartContext.Provider value={{ data, options, getDataSets, response, selectedId, setSelectedId, ids }}>
