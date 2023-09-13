@@ -1,9 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
+import MultiChart from '../components/chart/MultiChart';
+import ChartProvider from '../context/ChartContext';
 
 export default function Home() {
-  const [data, setData] = useState<any>([]);
-
-  useEffect(() => {}, []);
-
-  return <div>Home</div>;
+  return (
+    <ChartProvider>
+      <MultiChart />
+    </ChartProvider>
+  );
 }
