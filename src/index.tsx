@@ -8,6 +8,7 @@ import reportWebVitals from './reportWebVitals';
 //   const { worker } = require('./mocks/browser');
 //   worker.start();
 // }
+
 const { worker } = require('./mocks/browser');
 worker.start();
 
