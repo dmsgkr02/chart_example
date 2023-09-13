@@ -11,13 +11,13 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          ref: 'master'
+          ref: 'main'
       - run: npm ci
       - run: npm run test
       - run: npm run build
       # s3 upload
       # aws cli
-      - uses: jakejarvis/s3-sync-action@master
+      - uses: jakejarvis/s3-sync-action@main
         with:
           args: --delete
         env:
