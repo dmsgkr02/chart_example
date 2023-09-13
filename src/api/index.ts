@@ -16,5 +16,5 @@ export class HttpClientImpl implements HttpClient {
 }
 
 // const BASE_URL = process.env.NODE_ENV === 'production' ? process.env.REACT_APP_PROD_API_URL : process.env.REACT_APP_DEV_API_URL;
-// const BASE_URL = process.env.REACT_APP_DEV_API_URL;
-export const httpClientInstanse = new HttpClientImpl('');
+const BASE_URL = process.env.REACT_APP_DEV_API_URL;
+export const httpClientInstanse = new HttpClientImpl(BASE_URL);
