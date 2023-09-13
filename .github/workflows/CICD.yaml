@@ -17,7 +17,7 @@ jobs:
       - run: npm run build
       # s3 upload
       # aws cli
-      - uses: jakejarvis/s3-sync-action@main
+      - uses: jakejarvis/s3-sync-action@master
         with:
           args: --delete
         env:
