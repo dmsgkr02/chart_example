@@ -9,8 +9,6 @@ export class HttpClientImpl implements HttpClient {
   }
 
   fetch(endpoint: string, options?: {}) {
-    console.info(`주소:  ${this.baseURL}${endpoint}`);
-
     return window.fetch(`${this.baseURL}${endpoint}`, {
       ...options,
     });
